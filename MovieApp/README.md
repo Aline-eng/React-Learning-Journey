@@ -1,0 +1,785 @@
+
+# What is React?
+
+React is a JavaScript library for building user interfaces (UIs), primarily for single-page applications (SPAs).
+
+- Developed and maintained by Facebook (now Meta).
+- Focuses on building component-based UI with efficient rendering using a virtual DOM.
+
+## Libraries vs Frameworks
+
+### Libraries
+
+- Collection of reusable code.
+- Reduce the need to write repetitive or complex things from scratch.
+- You control how and when it’s used. Few boundaries.
+
+### Frameworks
+
+- Predetermined architecture and patterns.
+- You work within the constraints set by the framework.
+
+## Why Choose React
+
+- High job demand
+- Large ecosystem
+- Fewer hidden “magic” behaviors
+- Composable: build with small, reusable pieces
+- Declarative: describe the UI, React handles updates
+- Actively developed
+
+## Where not to use it
+
+- Small static projects or simple landing pages
+- Strict network load constraints
+- Very limited maintenance time
+
+# JSX
+
+JSX is syntactic sugar that looks like HTML in your JavaScript, but it compiles to JavaScript objects that describe UI elements.
+
+- JSX looks like HTML, but it is not HTML.
+- Avoid reserved JS keywords like class in JSX. Use className instead.
+
+# Components
+
+Components are functions that return React elements. Use PascalCase names and render them like tags.
+
+- Components are pure functions: given the same props/state, they return the same output and do not affect external systems.
+
+```jsx
+function MyComponent() {
+  return <h1>Hello World!</h1>;
+}
+root.render(<MyComponent />);
+```
+
+# Props
+
+- Props are read-only JavaScript objects passed into components.
+- They are immutable.
+- Enable reusability of components with custom content or data.
+- Similar to function arguments, but for components.
+
+```jsx
+function Welcome(props) {
+  return <h1>Hello, {[props.name](http://props.name)}!</h1>;
+}
+// Usage
+<Welcome name="Sheja" />
+```
+
+# State
+
+State is a built-in object that stores dynamic data for a component. Changing state triggers a re-render.
+
+- Track changing values like form inputs, counters, toggles.
+- Re-render UI based on interactions or logic.
+
+### Why use State?
+
+- Make components interactive and dynamic.
+- Keeps UI and data in sync.
+
+### Things to watch for
+
+- Do not mutate state directly. Always use setters (setState, setCount, etc.).
+- State updates are asynchronous. Don’t rely on immediate updates.
+- React may batch updates. Avoid reading updated state right after setting it.
+- Use multiple independent pieces of state instead of deeply nested state.
+
+## State vs Props
+
+|  | State | Props |
+| --- | --- | --- |
+| Ownership | Managed inside the component | Passed from parent |
+| Mutability | Change with setters (e.g., setState) | Read-only |
+| Purpose | Dynamic, local data | Configuration/sharing |
+| Triggers | Changing state re-renders component | Prop changes may re-render |
+
+### Pros
+
+- Enables interactive UIs
+- Makes components self-contained
+- Efficient re-rendering managed by React
+
+### Cons
+
+- Too much state can create complexity
+- Direct mutation causes bugs
+- Sometimes harder to debug than stateless components
+
+# Handling Forms in React
+
+## 1) Using an event listener onSubmit
+
+```jsx
+function handleSubmit(event) {
+  event.preventDefault(); // prevent page refresh
+  const formData = new FormData(event.currentTarget);
+  const email = formData.get("email");
+  console.log(email);
+  event.currentTarget.reset(); // clear inputs
+}
+
+export default function Signup() {
+  return (
+    <section>
+      <h1>Signup form</h1>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Email:</label>
+        <input id="email" type="email" name="email" placeholder="[joe@schmoe.com](mailto:joe@schmoe.com)" />
+        <br />
+
+        <label htmlFor="password">Password:</label>
+        <input id="password" type="password" name="password" />
+        <br />
+
+        <button>Submit</button>
+      </form>
+    </section>
+  );
+}
+```
+
+## 2) Using the action attribute (React 19 form actions style)
+
+```jsx
+function signUp(formData) {
+  const email = formData.get("email");
+  console.log(email);
+}
+
+// When the form has multiple entries, prefer Object.fromEntries:
+function signUpAll(formData) {
+  const data = Object.fromEntries(formData);
+  // For lists or multiple checkboxes, use getAll:
+  const dietaryRestrictions = formData.getAll("dietaryRestrictions");
+  const allData = { ...data, dietaryRestrictions };
+  console.log(allData);
+}
+
+export default function Signup() {
+  return (
+    <section>
+      <h1>Signup form</h1>
+      <form action={signUpAll}>
+        <label htmlFor="email">Email:</label>
+        <input id="email" type="email" name="email" placeholder="[joe@schmoe.com](mailto:joe@schmoe.com)" />
+        <br />
+
+        <label htmlFor="password">Password:</label>
+        <input id="password" type="password" name="password" />
+        <br />
+
+        <fieldset>
+          <legend>Dietary restrictions:</legend>
+          <label>
+            <input type="checkbox" name="dietaryRestrictions" value="kosher" />
+            Kosher
+          </label>
+          <label>
+            <input type="checkbox" name="dietaryRestrictions" value="vegan" />
+            Vegan
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="dietaryRestrictions"
+              defaultChecked={true}
+              value="gluten-free"
+            />
+            Gluten-free
+          </label>
+        </fieldset>
+
+        <button>Submit</button>
+      </form>
+    </section>
+  );
+}
+```
+
+# Conditional Rendering
+
+Render parts of the UI based on conditions.
+
+```jsx
+function MyComponent({ name }) {
+  return (
+    <h1>
+      Greetings
+      {name && <span>, {name.toUpperCase()}!</span>}
+    </h1>
+  );
+}
+
+root.render(<MyComponent name="sheja" />); // Greetings, SHEJA
+```
+
+Notes:
+
+- With Vite, direct image paths in JSX may fail due to build-time path changes. Use imports so Vite rewrites the paths consistently.
+- Don’t render raw objects in JSX.
+
+```jsx
+const arr = ["string", 10];
+root.render(<>{arr}</>); // Output: string10
+```
+
+- When mapping arrays to JSX, provide a stable key (prefer unique ids from APIs).
+
+# Side Effects
+
+Side effects are code that interacts with external systems:
+
+- Local storage
+- APIs
+- WebSockets
+- Direct DOM manipulation
+
+Not side effects: logic React can handle purely within rendering.
+
+# Built-in Components
+
+## Fragment
+
+Group elements without adding extra DOM nodes.
+
+```jsx
+root.render(
+  <>
+    <h1>Hello</h1>
+    <span>World</span>
+  </>
+
+  // Or
+  // import { Fragment } from "react";
+  // <Fragment>...</Fragment>
+);
+```
+
+# Hooks
+
+## useState
+
+Use when data changes over time and the UI must update.
+
+```jsx
+import { useState } from "react";
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+/*
+Each click updates state and triggers a re-render.
+*/
+```
+
+## useEffect
+
+Run side effects in response to state or prop changes. Has three parts:
+
+- Effect body
+- Dependency array
+- Optional cleanup function returned from the effect
+
+```jsx
+import { useEffect, useState } from "react";
+
+export default function App() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log(`The count is: ${count}`);
+    return () => {
+      console.log("Cleaning up");
+    };
+  }, [count]); // runs on mount and whenever count changes
+
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+## useContext
+
+Share data across components without prop drilling.
+
+```tsx
+import React, { createContext, useContext, useState } from "react";
+
+type OpenContextType = {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export const OpenContext = createContext<OpenContextType | undefined>(undefined);
+
+export default function OpenContextProvider({ children }: { children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return <OpenContext.Provider value={{ isOpen, setIsOpen }}>{children}</OpenContext.Provider>;
+}
+
+export function useOpenContext() {
+  const contextOpen = useContext(OpenContext);
+  if (contextOpen === undefined) {
+    throw new Error("OpenContext must be used within OpenContextProvider.");
+  }
+  return contextOpen;
+}
+```
+
+## useRef
+
+Holds a mutable value that does not cause re-renders when changed. Commonly used to access DOM elements.
+
+```jsx
+import { useRef } from "react";
+
+function App() {
+  const btnRef = useRef(null);
+
+  function clickIt() {
+    btnRef.current?.click();
+    alert("I am Clicked");
+  }
+
+  return (
+    <>
+      <button ref={btnRef} onClick={() => alert("Clicked!")}>Click me</button>
+      <button onClick={clickIt}>Trigger programmatically</button>
+    </>
+  );
+}
+```
+
+## useReducer
+
+Useful for complex state logic. You provide a reducer and an initial state.
+
+```jsx
+import { useReducer } from "react";
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return state + 1;
+    case "decrement":
+      return state - 1;
+    default:
+      throw new Error("Unknown action");
+  }
+}
+
+function App() {
+  const [count, dispatch] = useReducer(reducer, 0);
+  return (
+    <>
+      <h1>{count}</h1>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+    </>
+  );
+}
+```
+
+## useMemo
+
+Memoize expensive computations. Use only when a computation is costly or causing performance issues.
+
+```jsx
+import { useMemo, useState } from "react";
+
+function App() {
+  const [count, setCount] = useState(60);
+  const [items, setItems] = useState([{ name: "A", isSelected: false }, { name: "B", isSelected: true }]);
+
+  const selectedItem = useMemo(
+    () => items.find((item) => item.isSelected),
+    [items]
+  );
+
+  return (
+    <>
+      <h1>{count}</h1>
+      <h1>{selectedItem?.name}</h1>
+    </>
+  );
+}
+```
+
+## useCallback
+
+Memoize functions so they keep stable identity across renders, helpful when passing callbacks to child components.
+
+```jsx
+import { useCallback, useState } from "react";
+
+function App() {
+  const [count, setCount] = useState(60);
+
+  const handleAlert = useCallback(() => {
+    alert(`Count: ${count}`);
+  }, [count]);
+
+  return <SomeComponent handler={handleAlert} />;
+}
+```
+
+## useImperativeHandle (rare)
+
+Customize the instance value that is exposed to parent components when using refs.
+
+```jsx
+import { forwardRef, useImperativeHandle, useRef } from "react";
+
+const CoolButton = forwardRef(function CoolButton(_, ref) {
+  const btn = useRef(null);
+  useImperativeHandle(ref, () => ({
+    click() {
+      console.log("clicking button!");
+      btn.current?.click();
+    },
+  }));
+  return <button ref={btn} onClick={() => console.log("Clicked!")}>Inner</button>;
+});
+
+function App() {
+  const ref = useRef(null);
+  return <CoolButton ref={ref} />;
+}
+```
+
+## useLayoutEffect (rare)
+
+Same API as useEffect, but runs before the browser paints the updates. Useful when you need to measure DOM layout and synchronously re-render.
+
+## useDebugValue
+
+Display a label for custom hooks in React DevTools.
+
+```jsx
+import { useDebugValue, useEffect, useState } from "react";
+
+function useDisplayName(userId) {
+  const [displayName, setDisplayName] = useState();
+
+  useEffect(() => {
+    const data = fetchFromDatabase(userId); // pseudo
+    setDisplayName([data.name](http://data.name));
+  }, [userId]);
+
+  useDebugValue(displayName ?? "Loading...");
+  return displayName;
+}
+
+function App({ userId }) {
+  const displayName = useDisplayName(userId);
+  return <h1>{displayName}</h1>;
+}
+```
+
+---
+
+# React Q&A Preparing for React Gate
+
+## Beginner Level Questions
+
+### 1. What is React?
+
+- Define: Open-source JS library for building UIs, especially SPAs where data changes over time.
+- Why: Enables reusable UI components and declarative updates.
+
+### 2. What is JSX?
+
+- Define: Syntax extension for JavaScript that looks like HTML and supports JS expressions.
+- Why: Makes components more intuitive by combining markup and logic.
+- Syntax: <div>Hello {name}</div>
+- Rules: Transpile with Babel, use camelCase for attributes, curly braces for expressions.
+- Convention: PascalCase for components, always close tags.
+
+### 3. What is a component?
+
+- Define: Reusable UI piece, function or class returning JSX.
+- Why: Modularity, reusability, maintainability.
+- Types: Functional and class components.
+- Syntax: function MyComponent() { return <div>Hello</div>; }
+- Hierarchy: Components form a tree.
+
+### 4. What are props?
+
+- Define: Read-only data passed from parent to child.
+- Why: Data flow and customization without mutation.
+- Syntax: <Child name="John" /> then use [props.name](http://props.name)
+- Rules: Immutable. defaultProps can provide defaults.
+
+### 5. What is state?
+
+- Define: Holds dynamic data and triggers re-renders when updated.
+- Why: Manages internal data that changes over time like input.
+- Rules: Never mutate directly. Use setter functions.
+- History: Initially class-based, now commonly via hooks.
+
+### 6. How to render a component?
+
+- Define: Display a component in the DOM.
+- Syntax: ReactDOM.render(<App />, document.getElementById("root"))
+- Rule: Target a single root.
+
+### 7. What is the virtual DOM?
+
+- Define: In-memory representation of the DOM used to optimize updates.
+- Why: Faster updates by diffing and minimizing real DOM changes.
+
+### 8. What is Create React App?
+
+- Define: CLI to bootstrap React projects.
+- Why: Sets up Babel, Webpack, and best practices quickly.
+- Syntax: npx create-react-app my-app
+
+### 9. What is a functional component?
+
+- Define: Plain function returning JSX.
+- Why: Simpler and performant for many cases.
+- History: Became primary with hooks.
+
+### 10. What is a class component?
+
+- Define: ES6 class extending React.Component with a render method.
+- Why: Historically used for state and lifecycle before hooks.
+
+### 11. How to handle events in React?
+
+- Define: Bind functions to interactions like clicks.
+- Syntax: <button onClick={handleClick}>Click</button>
+- Rules: camelCase events, pass a function not a function call.
+
+### 12. What is conditional rendering?
+
+- Define: Render elements based on conditions.
+- Syntax: {condition ? <True /> : <False />} or short-circuit with &&
+
+### 13. What are lists and keys?
+
+- Define: Render arrays of elements. Keys uniquely identify items.
+- Syntax: {[items.map](http://items.map)(item => <li key={[item.id](http://item.id)}>{[item.name](http://item.name)}</li>)}
+- Rule: Keys unique among siblings. Avoid array indices if possible.
+
+### 14. What is React.Fragment?
+
+- Define: Group elements without extra DOM nodes.
+- Syntax: <React.Fragment>…</React.Fragment> or <>…</>
+
+### 15. What is useState?
+
+- Define: Hook to add state to function components.
+- Rules: Call at top level. Updates are async.
+
+## Intermediate Level Questions
+
+### 1. Lifecycle methods
+
+- Define: Methods invoked at mount, update, unmount in class components.
+- useEffect replaces many lifecycle patterns in function components.
+
+### 2. What is useEffect?
+
+- Define: Side effects in function components.
+- Syntax: useEffect(() => { / *effect* / return () => {/ *cleanup* /} }, [deps])
+- Rule: Dependency array controls when it runs.
+
+### 3. What is Context API?
+
+- Define: Share data without prop drilling across deep trees.
+- Syntax: const Ctx = createContext(); <Ctx.Provider value={value}>…</Ctx.Provider>
+
+### 4. What is React Router?
+
+- Define: Client-side routing for React apps.
+- Syntax: <Routes><Route path="/" element={<Home />} /></Routes>
+
+### 5. Controlled components
+
+- Define: Form elements controlled by React state.
+- Syntax: <input value={value} onChange={setValue} />
+
+### 6. Uncontrolled components
+
+- Define: Form elements that manage their own state via the DOM.
+- Syntax: <input ref={ref} />
+
+### 7. Prop drilling
+
+- Define: Passing props through many levels.
+- Avoid with Context or state libraries.
+
+### 8. What is useReducer?
+
+- Define: Hook for complex state logic.
+- Syntax: const [state, dispatch] = useReducer(reducer, initialState)
+- Rule: Reducer must be pure.
+
+### 9. Memoization in React
+
+- Define: Cache results to avoid recomputation.
+- Tools: React.memo, useMemo, useCallback.
+
+### 10. React.memo
+
+- Define: Memoizes a component, skipping re-render if props are shallowly equal.
+
+### 11. useCallback
+
+- Define: Memoize callbacks to keep stable references.
+
+### 12. useMemo
+
+- Define: Memoize expensive computations.
+
+### 13. Fetching data in React
+
+- Use useEffect with fetch or axios.
+- Manage loading and error states.
+
+### 14. Error boundaries
+
+- Define: Class components catching errors in child trees.
+- Syntax: componentDidCatch, getDerivedStateFromError.
+
+### 15. Code splitting
+
+- Define: Lazy load chunks to reduce initial bundle size.
+- Syntax: const Lazy = lazy(() => import('./Comp')); <Suspense fallback={<Loading />}><Lazy /></Suspense>
+
+## Advanced Level Questions
+
+### 1. Suspense
+
+- Define: Coordinates async loading with graceful fallbacks.
+
+### 2. Concurrent mode
+
+- Define: Features enabling interruptible rendering for responsiveness.
+
+### 3. React Fiber
+
+- Define: Reconciliation engine enabling pausing, resuming, prioritizing work.
+
+### 4. Custom hooks
+
+- Define: Reusable stateful logic extracted into functions starting with use.
+
+### 5. Server-side rendering with Next.js
+
+- Define: Render on the server for SEO and faster first paint.
+
+### 6. Static site generation
+
+- Define: Pre-render pages at build time.
+
+### 7. Hydration
+
+- Define: Attach event handlers to server-rendered HTML.
+
+### 8. Portals
+
+- Define: Render children into a different DOM node.
+- Syntax: createPortal(<Child />, domNode)
+
+### 9. useRef
+
+- Define: Store mutable values without causing re-renders.
+
+### 10. forwardRef
+
+- Define: Pass a ref through a component to a child.
+
+### 11. useImperativeHandle
+
+- Define: Customize the ref interface exposed to parents.
+
+### 12. Profiler
+
+- Define: Measure performance of rendered components.
+
+### 13. Higher-order components (HOCs)
+
+- Define: Functions that take a component and return an enhanced one.
+
+### 14. Render props
+
+- Define: Share code via a function prop.
+
+### 15. Reconciliation
+
+- Define: Update the DOM to match new render output efficiently.
+
+## Expert Level Questions
+
+### 1. Diffing algorithm
+
+- Define: Compares old vs new virtual DOM to find minimal changes.
+- Keys are critical for list stability.
+
+### 2. Time slicing
+
+- Define: Break long renders into chunks for responsiveness.
+
+### 3. Priority levels in concurrent React
+
+- Define: Assign urgency to updates to optimize rendering order.
+
+### 4. Scheduler
+
+- Define: Manages task priorities and yields to the browser.
+
+### 5. Performance optimization
+
+- Techniques: Memoization, lazy loading, virtualization
+- Always profile first.
+
+### 6. Windowing/virtualization
+
+- Define: Render only visible list items to reduce DOM size.
+
+### 7. Event system
+
+- Define: Delegated, normalized synthetic events at the root.
+
+### 8. Synthetic events
+
+- Define: Wrapper around native events. Use e.persist() for async access in older versions.
+
+### 9. SSR without frameworks
+
+- Define: Use ReactDOMServer.renderToString on Node.js.
+
+### 10. Streaming SSR
+
+- Define: Send HTML in chunks as it renders. Supported with Suspense.
+
+### 11. Hooks internals
+
+- Define: Hooks rely on call order per component. Must be called unconditionally at top level.
+
+### 12. useTransition
+
+- Define: Mark non-urgent updates for smoother UI.
+
+### 13. useDeferredValue
+
+- Define: Defer value updates to a lower priority.
+
+### 14. React Server Components
+
+- Define: Server-only components that reduce client bundle size.
+
+### 15. Latest features (React 18/19)
+
+- React 18: Concurrent rendering, automatic batching.
+- React 19: Improvements around hooks and asset loading.
+
+---
+
+Citations: All content was taken from your pages React Theory and React Q&A Preparing for React Gate.[[1]](https://www.notion.so/React-Theory-29b5c854eac9813b966bd06d7598b612?pvs=21)[[2]](https://www.notion.so/React-Q-A-Preparing-for-React-Gate-29b5c854eac9817f8f4bf249fbb9a107?pvs=21)
