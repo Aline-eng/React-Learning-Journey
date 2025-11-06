@@ -1,7 +1,8 @@
 import React from "react";
+// import ExpenseItem from "../components/ExpenseItem";
 
-function ExpenseItem() {
-    const {id, title, amount, date, category } = ExpenseItem;
+function ExpenseItem({expense, onDelete}) {
+    const {id, title, amount, date, category } = expense;
 
     return (
         <li className="expense-item">
