@@ -1,5 +1,4 @@
 import React from "react";
-// import ExpenseItem from "../components/ExpenseItem";
 
 function ExpenseItem({expense, onDelete}) {
     const {id, title, amount, date, category } = expense;
